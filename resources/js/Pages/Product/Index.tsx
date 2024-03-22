@@ -2,27 +2,27 @@ import DangerButton from "@/Components/DangerButton";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { Category, PageProps } from "@/types";
+import { Product, PageProps } from "@/types";
 import { Head, Link, router } from "@inertiajs/react";
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 
-const pageTitle = "Category";
+const pageTitle = "Product";
 
 export default function Index({
     auth,
-    categories,
+    products,
     flash,
     search,
-}: PageProps<{ categories: Category[]; search: string }>) {
+}: PageProps<{ products: Product[]; search: string }>) {
     const [searchValue, setSearchValue] = useState(search ?? "");
     const [debouncedValue] = useDebounce(searchValue, 500);
     const isMounted = useRef(false);
 
-    const deleteData = async (category: Category) => {
+    const deleteData = async (category: Product) => {
         const confirmed = await confirm("Are you sure to delete this data?");
 
-        confirmed && router.delete(route("categories.destroy", category.id));
+        confirmed && router.delete(route("products.destroy", category.id));
     };
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export default function Index({
 
         if (isMounted.current == true) {
             console.info("triggered");
-            const url = route("categories.index");
+            const url = route("products.index");
             router.visit(url, {
                 data: { search: debouncedValue },
             });
@@ -75,13 +75,13 @@ export default function Index({
                     <div className="bg-white shadow sm:rounded-lg">
                         <div className="flex flex-row justify-between px-8 pt-6 mb-6">
                             <TextInput
-                                placeholder="Search..."
+                                placeholder="Search by name..."
                                 className="w-full max-w-xs"
                                 autoFocus
                                 value={searchValue}
                                 onChange={(e) => setSearchValue(e.target.value)}
                             />
-                            <Link href={route("categories.create")}>
+                            <Link href={route("products.create")}>
                                 <PrimaryButton>New Data</PrimaryButton>
                             </Link>
                         </div>
@@ -92,42 +92,70 @@ export default function Index({
                                     <tr>
                                         <th
                                             scope="col"
-                                            className="px-6 py-3 w-[70%]"
+                                            className="px-6 py-3 w-[25%]"
                                         >
                                             Name
                                         </th>
                                         <th
                                             scope="col"
-                                            className="px-6 py-3 w-[30%]"
+                                            className="px-6 py-3 w-[20%]"
+                                        >
+                                            Category
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 w-[15%]"
+                                        >
+                                            Price
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 w-[15%]"
+                                        >
+                                            Stock
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 w-[20%]"
                                         >
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {categories.length == 0 && (
+                                    {products.length == 0 && (
                                         <tr className="bg-white border-b">
                                             <td
                                                 className="px-6 py-4 font-semibold text-center"
-                                                colSpan={2}
+                                                colSpan={5}
                                             >
                                                 No Data
                                             </td>
                                         </tr>
                                     )}
-                                    {categories.map((category) => (
+                                    {products.map((product) => (
                                         <tr
                                             className="bg-white border-b"
-                                            key={category.id}
+                                            key={product.id}
                                         >
                                             <td className="px-6 py-4">
-                                                {category.name}
+                                                {product.name}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {product.category?.name ??
+                                                    "No Category"}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {product.price}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {product.stock}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <Link
                                                     href={route(
-                                                        "categories.edit",
-                                                        category.id
+                                                        "products.edit",
+                                                        product.id
                                                     )}
                                                 >
                                                     <PrimaryButton
@@ -139,7 +167,7 @@ export default function Index({
                                                 </Link>
                                                 <DangerButton
                                                     onClick={(e) =>
-                                                        deleteData(category)
+                                                        deleteData(product)
                                                     }
                                                     type="button"
                                                 >

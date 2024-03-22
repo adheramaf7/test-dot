@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request)
     {
         $categories = Category::query()
@@ -25,17 +23,11 @@ class CategoryController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return inertia('Category/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(SaveCategoryRequest $request)
     {
         Category::create($request->validated());
@@ -43,17 +35,11 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('message', 'Data saved successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Category $category)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Category $category)
     {
         return inertia('Category/Edit', [
@@ -61,22 +47,19 @@ class CategoryController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(SaveCategoryRequest $request, Category $category)
     {
         $category->update($request->validated());
         return redirect()->route('categories.index')->with('message', 'Data saved successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Category $category)
     {
-        $category->delete();
-
+        try {
+            $category->delete();
+        } catch (\Throwable $th) {
+            return redirect()->route('categories.index')->with('message', 'There was a problem deleting data.');
+        }
         return redirect()->route('categories.index')->with('message', 'Data deleted successfully.');
     }
 }
